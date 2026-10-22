@@ -1,0 +1,6 @@
+{
+  "name": "New Zealand Citizenship Test",
+  "description": "Comprehensive New Zealand citizenship preparation platform featuring official-style practice tests, rich historical milestones, Te Tiriti o Waitangi curriculum, Te Reo Māori study cards, and ceremony guidance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
