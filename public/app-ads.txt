@@ -1,0 +1,3 @@
+# Google AdMob app-ads.txt Authorized Digital Sellers verification
+# https://support.google.com/admob/answer/9363762
+google.com, pub-3940256099942544, DIRECT, f08c47fec0942fa0

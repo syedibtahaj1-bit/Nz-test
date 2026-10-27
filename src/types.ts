@@ -115,6 +115,20 @@ export interface ConsultancyBooking {
   status: 'confirmed' | 'completed' | 'rescheduled';
 }
 
+export interface PremiumSubscription {
+  isActive: boolean;
+  subscribedAt: string;
+  planName: string;
+  amountNZD: number;
+  paymentMethod: 'debit_card';
+  cardLast4: string;
+  cardBrand: 'mastercard' | 'visa' | 'eftpos' | 'generic';
+  personalTutorName: string;
+  personalTutorPhone: string;
+  personalTutorEmail: string;
+  nextRenewalDate: string;
+}
+
 export interface UserProgress {
   completedModules: string[]; // module ids
   completedTests: QuizResult[];
@@ -133,5 +147,12 @@ export interface UserProgress {
   };
   savedDebitCard?: SavedDebitCard;
   consultancyBookings?: ConsultancyBooking[];
+  subscription?: PremiumSubscription;
+}
+
+declare global {
+  interface Window {
+    adsbygoogle?: unknown[];
+  }
 }
 

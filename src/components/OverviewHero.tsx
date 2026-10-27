@@ -9,7 +9,10 @@ import {
   CheckCircle2, 
   Sliders, 
   Sparkles,
-  Zap
+  Zap,
+  Crown,
+  CreditCard,
+  Phone
 } from 'lucide-react';
 import { UserProgress } from '../types';
 import { calculateProgressSummary, getTodayQuestionsAnswered } from '../utils/storage';
@@ -19,13 +22,15 @@ interface OverviewHeroProps {
   onNavigate: (tab: string) => void;
   onStartQuiz: (mode: 'mock_exam' | 'quick_drill') => void;
   onUpdateDailyGoal?: (goal: number) => void;
+  onOpenSubscription?: () => void;
 }
 
 export const OverviewHero: React.FC<OverviewHeroProps> = ({
   progress,
   onNavigate,
   onStartQuiz,
-  onUpdateDailyGoal
+  onUpdateDailyGoal,
+  onOpenSubscription
 }) => {
   const summary = calculateProgressSummary(progress);
   const [isEditingGoal, setIsEditingGoal] = useState(false);
@@ -310,6 +315,75 @@ export const OverviewHero: React.FC<OverviewHeroProps> = ({
           </p>
         </div>
       </div>
+
+      {/* Premium Service & Personal Tutor ($15) Subscription Banner */}
+      {onOpenSubscription && (
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-stone-900 via-emerald-950 to-stone-900 text-white p-5 sm:p-6 shadow-md border border-emerald-900/40">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-amber-400 text-stone-950 flex items-center justify-center font-bold shrink-0 shadow-lg mt-0.5">
+                <Crown className="w-6 h-6 fill-current" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-editorial font-bold text-base sm:text-lg text-white">
+                    Premium Service & 1-on-1 Personal Tutor
+                  </span>
+                  <span className="px-2 py-0.5 bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-full font-mono text-[10px] font-bold">
+                    $15 NZD / Month
+                  </span>
+                  {progress.savedDebitCard ? (
+                    <span className="px-2 py-0.5 bg-white/10 text-emerald-200 rounded-full font-mono text-[10px] flex items-center gap-1">
+                      <CreditCard className="w-3 h-3 text-amber-300" />
+                      <span>Card •••• {progress.savedDebitCard.last4} Saved</span>
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 bg-white/10 text-stone-300 rounded-full font-mono text-[10px] flex items-center gap-1">
+                      <CreditCard className="w-3 h-3 text-stone-400" />
+                      <span>No Card Saved</span>
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-stone-300 max-w-2xl leading-relaxed">
+                  {progress.subscription?.isActive ? (
+                    <span>Your personal tutor <strong>Aroha Henderson, LLB</strong> is actively assigned to your citizenship test preparation. Call or message your tutor anytime at <strong>+64 21 029 4812</strong>.</span>
+                  ) : (
+                    <span>Accelerate your preparation with private 1-on-1 personal tutoring, Te Reo Māori oath coaching, DIA presence audit, and priority review.</span>
+                  )}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
+              {progress.subscription?.isActive ? (
+                <>
+                  <a
+                    href="tel:+64210294812"
+                    className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors border border-white/15"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-emerald-300" />
+                    <span>Call Tutor</span>
+                  </a>
+                  <button
+                    onClick={onOpenSubscription}
+                    className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-stone-950 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+                  >
+                    Manage Tutor ($15)
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={onOpenSubscription}
+                  className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-stone-950 rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer hover:scale-[1.02]"
+                >
+                  <Crown className="w-4 h-4 fill-current" />
+                  <span>{progress.savedDebitCard ? 'Subscribe with Saved Card ($15)' : 'Subscribe to Premium ($15)'}</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Feature Showcase Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

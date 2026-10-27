@@ -1,9 +1,13 @@
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  onOpenAdMobSetup?: () => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onOpenAdMobSetup }) => {
   return (
-    <footer className="mt-20 border-t border-stone-200 dark:border-stone-800 bg-stone-100/60 dark:bg-stone-900/40 text-stone-600 dark:text-stone-400 text-xs py-12 transition-colors duration-200">
+    <footer className="mt-20 border-t border-stone-200 dark:border-stone-800 bg-stone-100/60 dark:bg-stone-900/40 text-stone-600 dark:text-stone-400 text-xs py-12 transition-colors duration-200 no-print">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
@@ -19,6 +23,17 @@ export const Footer: React.FC = () => {
             <p className="text-stone-500 dark:text-stone-400 max-w-sm leading-relaxed text-xs">
               An educational citizenship preparation platform designed to help prospective citizens study New Zealand history, Te Tiriti o Waitangi, democratic institutions, and civic responsibilities.
             </p>
+            {onOpenAdMobSetup && (
+              <div className="pt-2">
+                <button
+                  onClick={onOpenAdMobSetup}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-stone-200/80 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-[11px] font-medium hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors cursor-pointer"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                  <span>Google AdMob Connected</span>
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">

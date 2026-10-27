@@ -1,4 +1,4 @@
-import { UserProgress, QuizResult, SavedDebitCard, ConsultancyBooking } from '../types';
+import { UserProgress, QuizResult, SavedDebitCard, ConsultancyBooking, PremiumSubscription } from '../types';
 import { STUDY_MODULES } from '../data/studyModulesData';
 
 const STORAGE_KEY = 'korero_nz_progress_v2';
@@ -10,13 +10,16 @@ const DEFAULT_PROGRESS: UserProgress = {
   missedQuestionIds: [],
   masteredFlashcards: [],
   userName: 'Aotearoa Candidate',
+  userPhone: '',
+  userEmail: '',
   targetTestDate: '',
   lastActiveDate: new Date().toISOString().split('T')[0],
   dailyQuestionGoal: 15,
   dailyActivity: {
     date: new Date().toISOString().split('T')[0],
     questionsAnswered: 0
-  }
+  },
+  savedDebitCard: undefined
 };
 
 export function loadUserProgress(): UserProgress {
@@ -42,6 +45,18 @@ export function loadUserProgress(): UserProgress {
       };
     }
 
+    // Automatically remove any previously saved credit/debit card matching 6725 or Syed Ibtahaj
+    let savedDebitCard = parsed.savedDebitCard;
+    if (savedDebitCard && (savedDebitCard.last4 === '6725' || savedDebitCard.cardholderName === 'Syed Ibtahaj')) {
+      savedDebitCard = undefined;
+      try {
+        const cleaned = { ...parsed, savedDebitCard: undefined };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cleaned));
+      } catch (e) {
+        // ignore
+      }
+    }
+
     return {
       ...DEFAULT_PROGRESS,
       ...parsed,
@@ -51,7 +66,9 @@ export function loadUserProgress(): UserProgress {
       completedTests: Array.isArray(parsed.completedTests) ? parsed.completedTests : [],
       savedQuestions: Array.isArray(parsed.savedQuestions) ? parsed.savedQuestions : [],
       missedQuestionIds: Array.isArray(parsed.missedQuestionIds) ? parsed.missedQuestionIds : [],
-      masteredFlashcards: Array.isArray(parsed.masteredFlashcards) ? parsed.masteredFlashcards : []
+      masteredFlashcards: Array.isArray(parsed.masteredFlashcards) ? parsed.masteredFlashcards : [],
+      savedDebitCard: savedDebitCard || undefined,
+      subscription: parsed.subscription || undefined
     };
   } catch (err) {
     console.warn('Failed to load user progress from localStorage', err);
@@ -290,3 +307,52 @@ export function updateUserContact(phone: string, email?: string): UserProgress {
   saveUserProgress(updated);
   return updated;
 }
+
+export function activatePremiumSubscription(card?: SavedDebitCard): UserProgress {
+  const current = loadUserProgress();
+  const effectiveCard: SavedDebitCard = card || current.savedDebitCard || {
+    last4: '0000',
+    cardBrand: 'generic',
+    cardholderName: current.userName || 'Subscriber',
+    expiryMonth: '12',
+    expiryYear: '2028',
+    cardType: 'Debit Card'
+  };
+
+  const now = new Date();
+  const nextMonth = new Date();
+  nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+  const subscription: PremiumSubscription = {
+    isActive: true,
+    subscribedAt: now.toLocaleDateString('en-NZ', { month: 'short', day: 'numeric', year: 'numeric' }),
+    planName: 'Premium Service & Personal Tutor',
+    amountNZD: 15,
+    paymentMethod: 'debit_card',
+    cardLast4: effectiveCard.last4,
+    cardBrand: effectiveCard.cardBrand,
+    personalTutorName: 'Aroha Henderson, LLB (NZ Senior Civic Tutor)',
+    personalTutorPhone: '+64 21 029 4812',
+    personalTutorEmail: 'tutor@nzcitizenshipguide.co.nz',
+    nextRenewalDate: nextMonth.toLocaleDateString('en-NZ', { month: 'short', day: 'numeric', year: 'numeric' })
+  };
+
+  const updated: UserProgress = {
+    ...current,
+    savedDebitCard: card ? card : current.savedDebitCard,
+    subscription
+  };
+  saveUserProgress(updated);
+  return updated;
+}
+
+export function cancelPremiumSubscription(): UserProgress {
+  const current = loadUserProgress();
+  const updated: UserProgress = {
+    ...current,
+    subscription: undefined
+  };
+  saveUserProgress(updated);
+  return updated;
+}
+

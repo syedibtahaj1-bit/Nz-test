@@ -25,6 +25,10 @@ import { CeremonyGuide } from './components/CeremonyGuide';
 import { FlashcardsViewer } from './components/FlashcardsViewer';
 import { ConsultancyView } from './components/ConsultancyView';
 import { ReadinessCertificateModal } from './components/ReadinessCertificateModal';
+import { AdMobBanner } from './components/AdMobBanner';
+import { AdMobSetupModal } from './components/AdMobSetupModal';
+import { AdMobInterstitialModal } from './components/AdMobInterstitialModal';
+import { PremiumSubscriptionModal } from './components/PremiumSubscriptionModal';
 import { QUESTION_CATEGORIES } from './data/citizenshipQuestions';
 import { Award, Clock, ArrowRight } from 'lucide-react';
 
@@ -35,6 +39,9 @@ export default function App() {
   const [activeQuizCategory, setActiveQuizCategory] = useState<CategoryId | undefined>(undefined);
   const [isCertificateOpen, setIsCertificateOpen] = useState(false);
   const [historySubTab, setHistorySubTab] = useState<'milestones' | 'treaty'>('milestones');
+  const [isAdMobModalOpen, setIsAdMobModalOpen] = useState(false);
+  const [isInterstitialOpen, setIsInterstitialOpen] = useState(false);
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
 
   // Dark Mode Theme State with system fallback & localStorage
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -77,6 +84,11 @@ export default function App() {
 
   const handleSaveQuizResult = (result: QuizResult) => {
     setProgress(prev => recordTestResult(prev, result));
+    if (result.mode === 'mock_exam') {
+      setTimeout(() => {
+        setIsInterstitialOpen(true);
+      }, 800);
+    }
   };
 
   const handleToggleBookmark = (questionId: string) => {
@@ -154,6 +166,8 @@ export default function App() {
         moduleCompletionPercentage={summary.moduleCompletionPercentage}
         theme={theme}
         toggleTheme={toggleTheme}
+        onOpenSubscription={() => setIsSubscriptionModalOpen(true)}
+        isSubscribed={!!progress.subscription?.isActive}
       />
 
       {/* Main View Area */}
@@ -179,6 +193,7 @@ export default function App() {
                 onNavigate={(tab) => setActiveTab(tab)}
                 onStartQuiz={(mode) => handleStartQuiz(mode)}
                 onUpdateDailyGoal={handleUpdateDailyGoal}
+                onOpenSubscription={() => setIsSubscriptionModalOpen(true)}
               />
             )}
 
@@ -389,6 +404,14 @@ export default function App() {
           </>
         )}
 
+        {/* Global Responsive Google AdMob Banner (Hidden during exam quizzes or for Premium Subscribers) */}
+        {!activeQuizMode && !progress.subscription?.isActive && (
+          <AdMobBanner 
+            onOpenSettings={() => setIsAdMobModalOpen(true)}
+            className="pt-6"
+          />
+        )}
+
       </main>
 
       {/* Printable Readiness Certificate Modal */}
@@ -399,8 +422,32 @@ export default function App() {
         />
       )}
 
+      {/* Google AdMob Setup & Verification Modal */}
+      {isAdMobModalOpen && (
+        <AdMobSetupModal
+          onClose={() => setIsAdMobModalOpen(false)}
+          onPreviewInterstitial={() => setIsInterstitialOpen(true)}
+        />
+      )}
+
+      {/* Google AdMob Full-Screen Interstitial Ad Modal */}
+      {isInterstitialOpen && (
+        <AdMobInterstitialModal
+          onClose={() => setIsInterstitialOpen(false)}
+        />
+      )}
+
+      {/* Premium Service & Personal Tutor ($15) Subscription Modal */}
+      {isSubscriptionModalOpen && (
+        <PremiumSubscriptionModal
+          progress={progress}
+          onUpdateProgress={(updated) => setProgress(updated)}
+          onClose={() => setIsSubscriptionModalOpen(false)}
+        />
+      )}
+
       {/* Footer */}
-      <Footer />
+      <Footer onOpenAdMobSetup={() => setIsAdMobModalOpen(true)} />
     </div>
   );
 }

@@ -128,9 +128,9 @@ export const ConsultancyView: React.FC<ConsultancyViewProps> = ({
   
   // Client Contact Details
   const [countryCode, setCountryCode] = useState('+64');
-  const [phoneNumber, setPhoneNumber] = useState(progress.userPhone ? progress.userPhone.replace(/^\+\d+\s*/, '') : '21 029 4812');
+  const [phoneNumber, setPhoneNumber] = useState(progress.userPhone ? progress.userPhone.replace(/^\+\d+\s*/, '') : '');
   const [clientName, setClientName] = useState(progress.userName && progress.userName !== 'Aotearoa Candidate' ? progress.userName : '');
-  const [clientEmail, setClientEmail] = useState(progress.userEmail || 'syedibtahaj1@gmail.com');
+  const [clientEmail, setClientEmail] = useState(progress.userEmail || '');
   const [consultationNotes, setConsultationNotes] = useState('');
 
   // Payment Options State
@@ -142,8 +142,8 @@ export const ConsultancyView: React.FC<ConsultancyViewProps> = ({
   const [cardholderName, setCardholderName] = useState(clientName || '');
   const [expiry, setExpiry] = useState('');
   const [cvc, setCvc] = useState('');
-  const [postalCode, setPostalCode] = useState('1010');
-  const [saveCardForFuture, setSaveCardForFuture] = useState(true);
+  const [postalCode, setPostalCode] = useState('');
+  const [saveCardForFuture, setSaveCardForFuture] = useState(false);
 
   // Flow State
   const [isProcessing, setIsProcessing] = useState(false);
@@ -587,7 +587,7 @@ export const ConsultancyView: React.FC<ConsultancyViewProps> = ({
                       setClientName(e.target.value);
                       if (!cardholderName) setCardholderName(e.target.value);
                     }}
-                    placeholder="e.g. Syed Ibtahaj"
+                    placeholder="e.g. Jane Citizen"
                     className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs sm:text-sm text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-800"
                   />
                 </div>
@@ -602,7 +602,7 @@ export const ConsultancyView: React.FC<ConsultancyViewProps> = ({
                     required
                     value={clientEmail}
                     onChange={(e) => setClientEmail(e.target.value)}
-                    placeholder="e.g. syedibtahaj1@gmail.com"
+                    placeholder="e.g. applicant@domain.nz"
                     className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs sm:text-sm text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-800"
                   />
                 </div>
@@ -632,12 +632,12 @@ export const ConsultancyView: React.FC<ConsultancyViewProps> = ({
                     required
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="21 029 4812"
+                    placeholder="21 000 0000"
                     className="flex-1 px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs sm:text-sm font-mono text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-800"
                   />
                 </div>
                 <p className="text-[10px] text-stone-500 dark:text-stone-400">
-                  Adviser will reach out on <strong className="text-stone-700 dark:text-stone-300 font-mono">{countryCode} {phoneNumber}</strong> via Phone Call or WhatsApp.
+                  Adviser will reach out on <strong className="text-stone-700 dark:text-stone-300 font-mono">{countryCode} {phoneNumber || '...'}</strong> via Phone Call or WhatsApp.
                 </p>
               </div>
 
